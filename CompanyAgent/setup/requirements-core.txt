@@ -1,0 +1,14 @@
+# 必需的依赖：装不上就不算装好（setup/install.sh 会停下来说明原因）。
+# 版本下限的来历见 requirements.txt 和 docs/内核迁移说明.md。
+langchain>=1.3.3                    # create_agent 和官方中间件；批准中间件的 when 条件从 1.3.3 起才有
+langchain-core>=1.0
+langgraph>=1.0                      # interrupt()、Command(resume=...)、检查点
+langgraph-checkpoint-sqlite>=3.0    # SqliteSaver：任务状态存在数据目录的 checkpoints.db
+langchain-openai>=1.1               # ChatOpenAI：接 vLLM 等 OpenAI 兼容服务
+langchain-mcp-adapters>=0.2         # 连接器（MCP）；没配置连接器时用不到
+httpx>=0.27                         # 内网端点不走系统代理（ChatOpenAI 的 http_client）
+openpyxl>=3.0                       # Excel
+python-docx>=0.8.11                 # Word
+python-pptx>=0.6.21                 # PPT
+pypdf>=3.0                          # PDF
+numpy                               # 资料库的向量（kb.engine=builtin）、语音的本机识别

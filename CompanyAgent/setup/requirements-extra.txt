@@ -1,0 +1,5 @@
+# 可选的依赖：一行一个，逐个安装；哪个装不上只少对应的功能，不影响启动。
+playwright>=1.63; python_version >= "3.10"   # 操作网页（用电脑上已有的 Chrome 或 Edge）
+chromadb                                     # 资料库的向量存进 Chroma（kb.engine=langchain）；装不上时向量存在账本里，照样能用
+langchain-chroma
+langchain-classic                            # EnsembleRetriever 等；和上面两个一起装齐，kb.engine=auto 才用 LangChain 这一套

@@ -1,0 +1,1 @@
+{"model":"__MODEL__","temperature":0.3,"max_tokens":900,"response_format":{"type":"json_object"},"messages":[{"role":"user","content":"把“周五前完成季度报告，周三交初稿，负责人张伟”整理成 JSON，字段为 deadline、draft、owner。"}],"chat_template_kwargs":{"enable_thinking":false}}

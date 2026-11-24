@@ -1,0 +1,1 @@
+{"model":"__MODEL__","temperature":0.3,"max_tokens":800,"messages":[{"role":"user","content":"写一段约400字的季度经营情况说明，数据可以虚构。"}],"chat_template_kwargs":{"enable_thinking":false}}

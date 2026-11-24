@@ -1,0 +1,30 @@
+# 自动安装生成的，每台电脑各自不同
+.venv/
+.venv.old-*/
+.tools/
+setup/wheels/
+setup/mirror.env
+setup/安装记录.txt
+setup/环境检查结果.txt
+setup/新内核自检.txt
+
+# 本单位自己的模型地址等默认值（样例是 site.example.json）
+site.json
+
+# 测试产生的结果（里面有模型的回答、这台电脑的信息）
+tests/results/
+tests/realmodel/results/
+
+# 运行时产生的数据：万一数据目录指到了项目里
+settings.json
+token
+*.db
+*.db-wal
+*.db-shm
+browser-profile/
+shared_cache/
+.agent/
+
+__pycache__/
+*.pyc
+.DS_Store

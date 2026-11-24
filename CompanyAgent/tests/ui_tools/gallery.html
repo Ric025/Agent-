@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>主题画廊</title>
+<!-- 主题画廊：把十个主题各画成一块小样。用法见 /home/claude/tools/README.md。
+     ?group=light / dark 只画浅色 / 深色五个；?only=<id> 只画一个（大图）；不带参数画全部。
+     这里的样式只用 themes.css 的变量，可以当整体重做时组件长相的参考。 -->
+<link rel="stylesheet" href="../ca/ui/themes.css">
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: #8a8a8a; font-family: var(--font-sans); padding: 24px; }
+  .grid { display: grid; grid-template-columns: repeat(var(--cols, 3), 880px); gap: 24px; }
+  .one .grid { --cols: 1; }
+
+  .sw { width: 880px; display: flex; flex-direction: column; border-radius: 12px; overflow: hidden;
+        background: var(--bg); color: var(--text); font-size: var(--fs-15); line-height: var(--lh-ui);
+        -webkit-font-smoothing: antialiased; }
+  .sw ::selection { background: var(--selection); }
+  .cap { display: flex; align-items: baseline; gap: 10px; padding: 10px 16px; background: var(--bg-side);
+         border-bottom: 1px solid var(--border); font-size: var(--fs-13); color: var(--text-2); }
+  .cap b { color: var(--text); font-weight: var(--fw-strong); font-size: var(--fs-14); }
+  .frame { display: flex; height: 850px; }
+
+  /* 侧栏 */
+  .side { width: 220px; flex: none; background: var(--bg-side); border-right: 1px solid var(--border);
+          display: flex; flex-direction: column; padding: 12px 8px; font-size: var(--fs-14); }
+  .row { display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: var(--r-sm); color: var(--text-2); }
+  .row svg { flex: none; }
+  .row.new { color: var(--text); font-weight: var(--fw-medium); margin-bottom: 4px; }
+  .row.new svg { color: var(--text); }
+  .row.cur { background: var(--surface-2); color: var(--text); }
+  .row.hover { background: color-mix(in srgb, var(--surface-2) 55%, transparent); }
+  .row .t { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .row .meta { color: var(--text-3); font-size: var(--fs-12); font-variant-numeric: tabular-nums; }
+  .group { padding: 14px 10px 4px; color: var(--text-3); font-size: var(--fs-12); }
+  .dot { width: 6px; height: 6px; border-radius: 50%; flex: none; }
+  .dot.need { background: var(--accent); }
+  .side .spacer { flex: 1; }
+  .side .nav { border-top: 1px solid var(--border); padding-top: 8px; }
+  .side kbd { font-family: var(--font-mono); font-size: 11px; color: var(--text-3); background: var(--surface-2);
+              border-radius: var(--r-xs); padding: 1px 5px; }
+
+  /* 主区 */
+  .main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+  .top { height: 46px; flex: none; display: flex; align-items: center; gap: 10px; padding: 0 20px; border-bottom: 1px solid var(--border); }
+  .top .title { font-size: var(--fs-14); color: var(--text); }
+  .tag { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-12); line-height: 1; padding: 5px 8px;
+         border-radius: var(--r-full); color: var(--text); white-space: nowrap; }
+  .tag .dot { width: 6px; height: 6px; }
+  .tag.need { background: var(--accent); color: var(--on-accent); font-weight: var(--fw-medium); }
+  .tag.need .dot { background: var(--on-accent); }
+  .tag.ok { background: var(--ok-soft); } .tag.ok .dot { background: var(--ok); }
+  .tag.warn { background: var(--warn-soft); } .tag.warn .dot { background: var(--warn); }
+  .tag.err { background: var(--err-soft); } .tag.err .dot { background: var(--err); }
+  .scroll { flex: 1; overflow: hidden; }
+  .col { width: 560px; margin: 0 auto; padding: 18px 0 8px; }
+
+  .user { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; margin-bottom: 14px; }
+  .bubble { background: var(--accent-soft); color: var(--on-accent-soft); padding: 9px 14px; border-radius: 16px 16px 4px 16px;
+            max-width: 82%; line-height: var(--lh-body); }
+  .chips { display: flex; gap: 6px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; font-size: var(--fs-12); color: var(--text-2);
+          background: var(--surface-2); border-radius: var(--r-sm); padding: 3px 8px; }
+
+  .steps { display: flex; align-items: center; gap: 8px; color: var(--text-2); font-size: var(--fs-13); padding: 4px 0 10px; }
+  .steps .dot { background: var(--ok); }
+  .steps .time { margin-left: auto; color: var(--text-3); font-variant-numeric: tabular-nums; }
+  .steps svg { color: var(--text-3); }
+
+  .md { line-height: var(--lh-body); }
+  .md h3 { font-size: var(--fs-17); font-weight: var(--fw-strong); margin: 0 0 4px; line-height: var(--lh-tight); }
+  .md p { margin: 0 0 10px; }
+  .md a { color: var(--link); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+  .md code { font-family: var(--font-mono); font-size: .88em; background: var(--code-bg); padding: 1px 5px; border-radius: var(--r-xs); }
+  .md table { border-collapse: collapse; width: 100%; font-size: var(--fs-14); margin: 2px 0 12px; }
+  .md th { text-align: left; font-weight: var(--fw-medium); color: var(--text-2); background: var(--surface-2); padding: 6px 10px; }
+  .md td { padding: 6px 10px; border-bottom: 1px solid var(--border); }
+  .md .n { text-align: right; font-variant-numeric: tabular-nums; }
+  .md .up { color: var(--ok); } .md .down { color: var(--err); }
+  .md pre { position: relative; margin: 0 0 12px; background: var(--code-bg); border-radius: var(--r-md); padding: 10px 12px;
+            font-family: var(--font-mono); font-size: var(--fs-13); line-height: 1.6; color: var(--text); overflow: hidden; }
+  .md pre .copy { position: absolute; top: 8px; right: 10px; font-family: var(--font-sans); font-size: var(--fs-12); color: var(--text-3); }
+  .md pre .c { color: var(--text-3); }
+  .md blockquote { margin: 0 0 10px; padding-left: 12px; border-left: 2px solid var(--border-strong); color: var(--text-2); }
+
+  .approve { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow), inset 0 0 0 1px var(--border);
+             padding: 14px 16px; margin: 6px 0 14px; position: relative; }
+  .approve::before { content: ""; position: absolute; left: 0; top: 14px; bottom: 14px; width: 3px; border-radius: 0 3px 3px 0; background: var(--accent); }
+  .approve .h { display: flex; align-items: center; gap: 8px; font-weight: var(--fw-strong); font-size: var(--fs-15); }
+  .approve .h .tag { margin-left: auto; font-weight: var(--fw-normal); }
+  .approve .path { font-family: var(--font-mono); font-size: var(--fs-13); color: var(--text-2); margin: 4px 0 10px; }
+  .approve .prev { background: var(--code-bg); border-radius: var(--r-sm); padding: 8px 10px; font-family: var(--font-mono);
+                   font-size: var(--fs-12); color: var(--text-2); line-height: 1.6; margin-bottom: 12px; }
+  .btns { display: flex; gap: 8px; }
+  .btn { font: inherit; font-size: var(--fs-14); border: 0; border-radius: var(--r-md); padding: 7px 16px; background: transparent; color: var(--text); }
+  .btn.primary { background: var(--accent); color: var(--on-accent); font-weight: var(--fw-medium); }
+  .btn.primary.hover { background: var(--accent-hover); }
+  .btn.ghost { background: var(--surface-2); }
+  .btn.focus { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+  .misc { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: var(--fs-13); color: var(--text-2); }
+  .misc .t3 { color: var(--text-3); font-size: var(--fs-12); }
+
+  .composer-wrap { flex: none; padding: 8px 0 18px; }
+  .composer { width: 580px; margin: 0 auto; background: var(--surface); border-radius: var(--r-xl); box-shadow: var(--shadow), inset 0 0 0 1px var(--border);
+              padding: 12px 12px 10px 16px; }
+  .composer .ph { color: var(--text-3); padding: 2px 0 12px; }
+  .composer .bar { display: flex; align-items: center; gap: 4px; }
+  .ib { width: 32px; height: 32px; border-radius: var(--r-full); display: inline-flex; align-items: center; justify-content: center; color: var(--text-2); }
+  .ib.hover { background: var(--surface-2); color: var(--text); }
+  .composer .mode { font-size: var(--fs-12); color: var(--text-3); margin-left: 4px; }
+  .send { margin-left: auto; background: var(--accent); color: var(--on-accent); }
+
+  .h1 { font-family: var(--font-display); font-weight: var(--fw-strong); font-size: var(--fs-20); padding-bottom: 6px;
+        border-bottom: var(--rule-width) solid var(--rule); display: inline-block; margin: 0 0 2px; }
+</style>
+</head>
+<body>
+<div class="grid" id="grid"></div>
+
+<template id="tpl">
+<section class="sw">
+  <div class="cap"><b class="nm"></b><span class="dk"></span><span class="id" style="margin-left:auto;font-family:var(--font-mono)"></span></div>
+  <div class="frame">
+    <aside class="side">
+      <div class="row new"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3.5v9M3.5 8h9"/></svg><span class="t">新对话</span><kbd>⌘K</kbd></div>
+      <div class="group">今天</div>
+      <div class="row cur"><span class="t">三季度各区域销售汇报</span><span class="dot need"></span></div>
+      <div class="row hover"><span class="t">供应商合同到期提醒</span><span class="meta">10:42</span></div>
+      <div class="row"><span class="t">核对 10 月差旅报销</span><span class="meta">09:15</span></div>
+      <div class="group">本周</div>
+      <div class="row"><span class="t">董事会会议纪要整理</span><span class="meta">周二</span></div>
+      <div class="row"><span class="t">招聘进度周报</span><span class="meta">周一</span></div>
+      <div class="spacer"></div>
+      <div class="nav">
+        <div class="row"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 2.5h7l3 3v8H3z"/><path d="M10 2.5v3h3M5.5 8.5h5M5.5 11h3.5"/></svg><span class="t">资料</span></div>
+        <div class="row"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13.5s-5-2.9-5-6.6A2.9 2.9 0 0 1 8 5a2.9 2.9 0 0 1 5 1.9c0 3.7-5 6.6-5 6.6z"/></svg><span class="t">记忆</span></div>
+        <div class="row"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="5.5"/><path d="M8 5v3l2 1.5"/></svg><span class="t">定时</span></div>
+        <div class="row"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 2.5 4 9h4l-1 4.5L12 7H8z"/></svg><span class="t">技能</span></div>
+        <div class="row"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="8" r="2"/><path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14M3.8 3.8l1 1M11.2 11.2l1 1M3.8 12.2l1-1M11.2 4.8l1-1"/></svg><span class="t">设置</span></div>
+      </div>
+    </aside>
+    <main class="main">
+      <div class="top"><span class="title">三季度各区域销售汇报</span><span class="tag need"><span class="dot"></span>等你处理</span></div>
+      <div class="scroll"><div class="col">
+        <div class="h1">三季度汇报</div>
+        <div class="user">
+          <div class="bubble">把三季度各区域销售数据做成 5 页汇报，重点讲华东为什么下滑</div>
+          <div class="chips"><span class="chip">技能：slides</span><span class="chip">三季度销售明细.xlsx<span style="color:var(--text-3)">248 KB</span></span></div>
+        </div>
+        <div class="steps"><span class="dot"></span>做了 5 步<span class="time">1 分 12 秒</span><svg width="14" height="14" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="m6 4 4 4-4 4"/></svg></div>
+        <div class="md">
+          <h3>三季度概况</h3>
+          <p>全国销售额 4.82 亿元，同比增长 6.1%。华东下滑主要来自两家大客户延期下单，详见 <a href="#">客户明细</a>；数据取自 <code>销售明细!A1:H2410</code>。</p>
+          <table>
+            <tr><th>区域</th><th class="n">销售额（万元）</th><th class="n">同比</th></tr>
+            <tr><td>华南</td><td class="n">14,260</td><td class="n up">+12.4%</td></tr>
+            <tr><td>华东</td><td class="n">11,830</td><td class="n down">−4.7%</td></tr>
+          </table>
+          <pre><span class="copy">复制</span><span class="c"># 按区域汇总</span>
+df.groupby("区域")["销售额"].sum().sort_values()</pre>
+        </div>
+        <div class="approve">
+          <div class="h">写入文件<span class="tag need"><span class="dot"></span>等你批准</span></div>
+          <div class="path">汇报/三季度销售汇报.pptx</div>
+          <div class="btns"><button class="btn primary">同意</button><button class="btn ghost">不同意</button><button class="btn focus">查看内容</button></div>
+        </div>
+        <div class="misc">
+          <span class="tag ok"><span class="dot"></span>已完成</span>
+          <span class="tag warn"><span class="dot"></span>上下文快满了</span>
+          <span class="tag err"><span class="dot"></span>读取失败</span>
+          <span>次要文字：来自三季度销售明细</span>
+          <span class="t3">弱文字：刚刚</span>
+        </div>
+      </div></div>
+      <div class="composer-wrap"><div class="composer">
+        <div class="ph">还要做什么？输入 / 看指令</div>
+        <div class="bar">
+          <span class="ib hover"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M8 3.5v9M3.5 8h9"/></svg></span>
+          <span class="ib"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="4" height="7.5" rx="2"/><path d="M3.5 8a4.5 4.5 0 0 0 9 0M8 12.5V14"/></svg></span>
+          <span class="mode">批准方式：自动</span>
+          <span class="ib send"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M8 13V3.5M4 7.5l4-4 4 4"/></svg></span>
+        </div>
+      </div></div>
+    </main>
+  </div>
+</section>
+</template>
+
+<script src="../ca/ui/theme.js"></script>
+<script>
+  var q = new URLSearchParams(location.search);
+  var list = window.CATheme.list;
+  var only = q.get('only'), group = q.get('group');
+  if (only) { list = list.filter(function (t) { return t.id === only; }); document.body.className = 'one'; }
+  else if (group === 'light') list = list.filter(function (t) { return !t.dark; });
+  else if (group === 'dark') list = list.filter(function (t) { return t.dark; });
+  var grid = document.getElementById('grid'), tpl = document.getElementById('tpl');
+  list.forEach(function (t) {
+    var n = tpl.content.firstElementChild.cloneNode(true);
+    n.setAttribute('data-theme', t.id);
+    n.querySelector('.nm').textContent = t.name;
+    n.querySelector('.dk').textContent = t.dark ? '深色' : '浅色';
+    n.querySelector('.id').textContent = t.id;
+    grid.appendChild(n);
+  });
+</script>
+</body>
+</html>

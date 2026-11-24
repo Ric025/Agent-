@@ -1,0 +1,471 @@
+/* CompanyAgent 主题：十套配色，全部颜色只在这个文件里定义。
+ *
+ * 用法
+ *   <html data-theme="plain">         由 theme.js 在页面最前面设好（auto 解析成 plain 或 ink-night）
+ *   <div data-theme="nord">…</div>     任何元素写上 data-theme，里面就用那个主题的变量（设置页的主题卡片靠这个画预览）
+ *   没有 data-theme（脚本没运行）时：浅色系统用"素白"，深色系统用"墨夜"。
+ *
+ * 组件里只许用下面这些变量，不许写死颜色。
+ *
+ * 一、随主题变的语义变量（每个主题都定义全）
+ *   --bg               主区底色
+ *   --bg-side          侧栏底色
+ *   --surface          卡片、输入框、菜单、批准卡片的底
+ *   --surface-2        悬停、当前项、次级底色（侧栏当前对话、表头、步骤展开区）。可能是半透明的，叠在 --bg 或 --bg-side 上都能看出来
+ *   --border           分区的细线（侧栏和主区之间、大段之间、表格行线）
+ *   --border-strong    需要看得见的边（输入框聚焦前的轮廓、复选框、分隔条）
+ *   --text             正文
+ *   --text-2           次要文字（说明、副标题、侧栏里的时间）
+ *   --text-3           更弱的文字（占位符、时间戳、计数）；只保证 3:1
+ *   --accent           强调色：只用于主要动作（发送、批准、保存）和"等你处理"
+ *   --accent-hover     强调色按钮悬停 / 按下
+ *   --on-accent        强调色底上的字和图标
+ *   --accent-soft      强调色的浅底：用户气泡、"等你处理"卡片的底
+ *   --on-accent-soft   --accent-soft 上的字（用户气泡的字色）
+ *   --link             链接
+ *   --ok / --warn / --err                  状态色（低饱和，当文字或图标用，对 --bg 不低于 3:1）
+ *   --ok-soft / --warn-soft / --err-soft   状态色的浅底（状态小标签、出错提示条的底）。
+ *                      浅底上的字：用 --text 或 --text-2 最稳，圆点 / 图标用状态色。状态色直接当字放在浅底上，
+ *                      大多数主题也有 3:1，但 Nord 的出错色（nord11）本身只有 3.05，放到浅底上会掉到 3 以下
+ *   --code-bg          行内代码和代码块的底
+ *   --focus            键盘焦点环（outline 颜色）
+ *   --selection        选中文字的底（::selection）
+ *   --shadow           输入框、卡片的柔和阴影（完整的 box-shadow 值）
+ *   --shadow-pop       弹出菜单、对话框的阴影（比 --shadow 重）
+ *   --overlay          对话框、窄窗口抽屉后面的遮罩
+ *   --rule             页面标题下那道线的颜色（只有"公文"是朱红，其余 transparent）
+ *   --rule-width       那道线的粗细（"公文" 2px，其余 0）
+ *   --font-display     页面标题、新对话页问候用的字体（"公文"是宋体，其余同 --font-sans）
+ *   color-scheme       light / dark，让滚动条、表单控件跟着变
+ *
+ * 二、不随主题变的（写在下面第一个 :root 里）
+ *   --font-sans / --font-mono / --font-serif           字体
+ *   --fs-12 … --fs-26                                  字号阶梯 12 / 13 / 14 / 15 / 17 / 20 / 26
+ *   --lh-tight / --lh-ui / --lh-body                   行高：标题 1.3 / 界面 1.5 / 正文 1.7
+ *   --fw-normal / --fw-medium / --fw-strong            字重 400 / 500 / 600（不用更重的）
+ *   --r-xs / --r-sm / --r-md / --r-lg / --r-xl / --r-full   圆角 4 / 6 / 10 / 14 / 20 / 999
+ *   --sp-1 … --sp-12                                   间距 4 / 8 / 12 / 16 / 20 / 24 / 32 / 40 / 48
+ *   --side-w / --col-w / --col-w-max                   侧栏宽 260、正文列宽 720 / 760
+ *   --dur-fast / --dur / --ease                        动效时长 120ms / 180ms 和缓动
+ *
+ * 三、出处：Solarized（Ethan Schoonover）、Catppuccin（Catppuccin 社区）、Nord（Arctic Ice Studio）、
+ *   Tokyo Night（enkia）、Gruvbox（morhetz）。色值用原版；对比度不够的地方换成同一套色板里的另一档，见各主题注释。
+ */
+
+:root {
+  --font-sans: -apple-system, "SF Pro Text", "PingFang SC", "Segoe UI Variable Text", "Segoe UI", "Microsoft YaHei UI", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
+  --font-mono: "SF Mono", "Cascadia Code", "JetBrains Mono", Consolas, "Noto Sans Mono CJK SC", monospace;
+  --font-serif: "Songti SC", "STSong", "SimSun", "Noto Serif CJK SC", serif;
+
+  --fs-12: 12px; --fs-13: 13px; --fs-14: 14px; --fs-15: 15px; --fs-17: 17px; --fs-20: 20px; --fs-26: 26px;
+  --lh-tight: 1.3; --lh-ui: 1.5; --lh-body: 1.7;
+  --fw-normal: 400; --fw-medium: 500; --fw-strong: 600;
+
+  --r-xs: 4px; --r-sm: 6px; --r-md: 10px; --r-lg: 14px; --r-xl: 20px; --r-full: 999px;
+  --sp-1: 4px; --sp-2: 8px; --sp-3: 12px; --sp-4: 16px; --sp-5: 20px; --sp-6: 24px; --sp-8: 32px; --sp-10: 40px; --sp-12: 48px;
+  --side-w: 260px; --col-w: 720px; --col-w-max: 760px;
+  --dur-fast: 120ms; --dur: 180ms; --ease: cubic-bezier(.2, .7, .2, 1);
+}
+
+/* ================= 我们自己的四个 ================= */
+
+/* 素白：一张白纸。纯中性的白和灰（不带蓝），强调色就是墨色，主按钮是黑的。
+   唯一带色相的是链接和焦点环：一种压暗的靛蓝，避开后台系统常见的宝蓝。 */
+:root:not([data-theme]),
+[data-theme="plain"] {
+  color-scheme: light;
+  --bg: #FFFFFF;
+  --bg-side: #F7F7F6;
+  --surface: #FFFFFF;
+  --surface-2: #EFEFED;
+  --border: #E8E8E6;
+  --border-strong: #CFCFCC;
+  --text: #18181A;
+  --text-2: #57575C;
+  --text-3: #85858A;
+  --accent: #18181A;
+  --accent-hover: #3A3A3E;
+  --on-accent: #FFFFFF;
+  --accent-soft: #F1F1EF;
+  --on-accent-soft: #18181A;
+  --link: #2648A6;
+  --ok: #2F7448;
+  --ok-soft: #EAF3ED;
+  --warn: #92600B;
+  --warn-soft: #FAF1DF;
+  --err: #B3261E;
+  --err-soft: #FBECEA;
+  --code-bg: #F4F4F2;
+  --focus: #2648A6;
+  --selection: rgba(38, 72, 166, .16);
+  --shadow: 0 1px 2px rgba(20, 20, 22, .04), 0 4px 18px rgba(20, 20, 22, .06);
+  --shadow-pop: 0 2px 6px rgba(20, 20, 22, .06), 0 14px 40px rgba(20, 20, 22, .12);
+  --overlay: rgba(20, 20, 22, .32);
+  --rule: transparent;
+  --rule-width: 0px;
+  --font-display: var(--font-sans);
+}
+
+/* 公文：红头文件的纸和朱红。宋体标题、标题下一道 2px 朱红线；只此两处，其余和素白一样克制。
+   出错色用比朱红更深更暗的绛红，好和强调色分开。 */
+[data-theme="gongwen"] {
+  color-scheme: light;
+  --bg: #FCFBF8;
+  --bg-side: #F4F2EC;
+  --surface: #FFFFFF;
+  --surface-2: #ECE8DE;
+  --border: #E4DFD3;
+  --border-strong: #C9C1AF;
+  --text: #1D1B19;
+  --text-2: #5A554D;
+  --text-3: #857F74;
+  --accent: #BE2A1F;
+  --accent-hover: #A2231A;
+  --on-accent: #FFFFFF;
+  --accent-soft: #F5E9E2;
+  --on-accent-soft: #1D1B19;
+  --link: #9E2219;
+  --ok: #3D6A37;
+  --ok-soft: #ECF1E6;
+  --warn: #8D5F0E;
+  --warn-soft: #F7EEDC;
+  --err: #8E1B1B;
+  --err-soft: #F6E4E1;
+  --code-bg: #F3F0E8;
+  --focus: #BE2A1F;
+  --selection: rgba(190, 42, 31, .14);
+  --shadow: 0 1px 2px rgba(60, 40, 20, .05), 0 4px 18px rgba(60, 40, 20, .07);
+  --shadow-pop: 0 2px 6px rgba(60, 40, 20, .07), 0 14px 40px rgba(60, 40, 20, .14);
+  --overlay: rgba(40, 30, 20, .32);
+  --rule: #BE2A1F;
+  --rule-width: 2px;
+  --font-display: var(--font-serif);
+}
+
+/* 青瓷：带一点青的灰白底，釉色强调。成功色用偏黄的草绿，和青色的强调色错开。 */
+[data-theme="celadon"] {
+  color-scheme: light;
+  --bg: #F7FAF9;
+  --bg-side: #ECF2F0;
+  --surface: #FFFFFF;
+  --surface-2: #E1EBE8;
+  --border: #D6E2DE;
+  --border-strong: #B3C6C0;
+  --text: #19231F;
+  --text-2: #4D5B56;
+  --text-3: #76847F;
+  --accent: #2A766D;
+  --accent-hover: #22645C;
+  --on-accent: #FFFFFF;
+  --accent-soft: #DDECE8;
+  --on-accent-soft: #19231F;
+  --link: #22645C;
+  --ok: #4F6F1F;
+  --ok-soft: #EBF1DE;
+  --warn: #8F6412;
+  --warn-soft: #F6EEDA;
+  --err: #A8382C;
+  --err-soft: #F7E6E3;
+  --code-bg: #EBF2EF;
+  --focus: #2A766D;
+  --selection: rgba(42, 118, 109, .18);
+  --shadow: 0 1px 2px rgba(20, 50, 45, .05), 0 4px 18px rgba(20, 50, 45, .07);
+  --shadow-pop: 0 2px 6px rgba(20, 50, 45, .07), 0 14px 40px rgba(20, 50, 45, .14);
+  --overlay: rgba(16, 36, 32, .32);
+  --rule: transparent;
+  --rule-width: 0px;
+  --font-display: var(--font-sans);
+}
+
+/* 墨夜：蓝黑的墨色底，柔和的字，强调色是月白（主按钮是一块发亮的浅色）。
+   用户气泡用带一点蓝的深底，不用强调色本身，免得一屏都是亮块。 */
+[data-theme="ink-night"] {
+  color-scheme: dark;
+  --bg: #15171B;
+  --bg-side: #101216;
+  --surface: #1C1F25;
+  --surface-2: #252A32;
+  --border: #2A2F37;
+  --border-strong: #3E4551;
+  --text: #E6E8EC;
+  --text-2: #A3AAB5;
+  --text-3: #7A828F;
+  --accent: #DCE6FF;
+  --accent-hover: #C3D2F7;
+  --on-accent: #12151B;
+  --accent-soft: #232B3A;
+  --on-accent-soft: #E6E8EC;
+  --link: #8FB3FF;
+  --ok: #7DBE96;
+  --ok-soft: rgba(125, 190, 150, .13);
+  --warn: #D9B36A;
+  --warn-soft: rgba(217, 179, 106, .13);
+  --err: #EE8A82;
+  --err-soft: rgba(238, 138, 130, .13);
+  --code-bg: #1A1D23;
+  --focus: #8FB3FF;
+  --selection: rgba(143, 179, 255, .26);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 24px rgba(0, 0, 0, .3);
+  --shadow-pop: 0 2px 8px rgba(0, 0, 0, .4), 0 16px 44px rgba(0, 0, 0, .5);
+  --overlay: rgba(4, 6, 10, .6);
+  --rule: transparent;
+  --rule-width: 0px;
+  --font-display: var(--font-sans);
+}
+
+/* 脚本没运行、系统是深色：用墨夜（和上面一模一样，改时两处一起改；测试会检查两处一致） */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    color-scheme: dark;
+    --bg: #15171B;
+    --bg-side: #101216;
+    --surface: #1C1F25;
+    --surface-2: #252A32;
+    --border: #2A2F37;
+    --border-strong: #3E4551;
+    --text: #E6E8EC;
+    --text-2: #A3AAB5;
+    --text-3: #7A828F;
+    --accent: #DCE6FF;
+    --accent-hover: #C3D2F7;
+    --on-accent: #12151B;
+    --accent-soft: #232B3A;
+    --on-accent-soft: #E6E8EC;
+    --link: #8FB3FF;
+    --ok: #7DBE96;
+    --ok-soft: rgba(125, 190, 150, .13);
+    --warn: #D9B36A;
+    --warn-soft: rgba(217, 179, 106, .13);
+    --err: #EE8A82;
+    --err-soft: rgba(238, 138, 130, .13);
+    --code-bg: #1A1D23;
+    --focus: #8FB3FF;
+    --selection: rgba(143, 179, 255, .26);
+    --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 24px rgba(0, 0, 0, .3);
+    --shadow-pop: 0 2px 8px rgba(0, 0, 0, .4), 0 16px 44px rgba(0, 0, 0, .5);
+    --overlay: rgba(4, 6, 10, .6);
+    --rule: transparent;
+    --rule-width: 0px;
+    --font-display: var(--font-sans);
+  }
+}
+
+/* ================= 开源配色（色值用原版） ================= */
+
+/* Solarized Light — Ethan Schoonover。底 base3，侧栏 base2（编辑器里的样子）。
+   原版正文 base00 / base01 在 base2 上不到 4.5，正文和次要文字换成更深的 base03 / base02，弱文字用 base00。
+   原版没有一个彩色在 base3 上到 4.5：链接用 base01 加下划线；按钮用 yellow 配 base03 的字。
+   green / cyan 在 base3 上都不到 3，成功色用 blue。
+   侧栏已经是 base2，当前项和悬停再用 base2 就看不出来：--surface-2 用半透明的 base1，在 base2 和 base3 上都显得出。 */
+[data-theme="solarized-light"] {
+  color-scheme: light;
+  --bg: #fdf6e3;
+  --bg-side: #eee8d5;
+  --surface: #fdf6e3;
+  --surface-2: rgba(147, 161, 161, .22);
+  --border: #eee8d5;
+  --border-strong: #93a1a1;
+  --text: #002b36;
+  --text-2: #073642;
+  --text-3: #586e75;
+  --accent: #b58900;
+  --accent-hover: #cb4b16;
+  --on-accent: #002b36;
+  --accent-soft: #eee8d5;
+  --on-accent-soft: #073642;
+  --link: #586e75;
+  --ok: #268bd2;
+  --ok-soft: rgba(38, 139, 210, .10);
+  --warn: #cb4b16;
+  --warn-soft: rgba(181, 137, 0, .14);
+  --err: #dc322f;
+  --err-soft: rgba(220, 50, 47, .10);
+  --code-bg: #eee8d5;
+  --focus: #268bd2;
+  --selection: rgba(147, 161, 161, .35);
+  --shadow: 0 1px 2px rgba(0, 43, 54, .06), 0 4px 18px rgba(0, 43, 54, .07);
+  --shadow-pop: 0 2px 6px rgba(0, 43, 54, .08), 0 14px 40px rgba(0, 43, 54, .16);
+  --overlay: rgba(0, 43, 54, .35);
+  --rule: transparent;
+  --rule-width: 0px;
+  --font-display: var(--font-sans);
+}
+
+/* Catppuccin Latte — Catppuccin 社区。底 base，侧栏 mantle，强调 mauve（Catppuccin 的招牌色）配 base 的字。
+   blue 在 base 上 4.34，链接改用 mauve；lavender 当焦点环太淡（2.81），焦点环用 blue；green 2.96 → teal；yellow / peach 不到 3 → maroon（Latte 色板里的一档），浅底仍用 yellow。 */
+[data-theme="catppuccin-latte"] {
+  color-scheme: light;
+  --bg: #eff1f5;
+  --bg-side: #e6e9ef;
+  --surface: #eff1f5;
+  --surface-2: #dce0e8;
+  --border: #dce0e8;
+  --border-strong: #acb0be;
+  --text: #4c4f69;
+  --text-2: #5c5f77;
+  --text-3: #7c7f93;
+  --accent: #8839ef;
+  --accent-hover: #7287fd;
+  --on-accent: #eff1f5;
+  --accent-soft: rgba(136, 57, 239, .12);
+  --on-accent-soft: #4c4f69;
+  --link: #8839ef;
+  --ok: #179299;
+  --ok-soft: rgba(64, 160, 43, .12);
+  --warn: #e64553;
+  --warn-soft: rgba(223, 142, 29, .18);
+  --err: #d20f39;
+  --err-soft: rgba(210, 15, 57, .10);
+  --code-bg: #e6e9ef;
+  --focus: #1e66f5;
+  --selection: rgba(124, 127, 147, .25);
+  --shadow: 0 1px 2px rgba(76, 79, 105, .06), 0 4px 18px rgba(76, 79, 105, .08);
+  --shadow-pop: 0 2px 6px rgba(76, 79, 105, .08), 0 14px 40px rgba(76, 79, 105, .18);
+  --overlay: rgba(76, 79, 105, .35);
+  --rule: transparent;
+  --rule-width: 0px;
+  --font-display: var(--font-sans);
+}
+
+/* Nord — Arctic Ice Studio。底 nord0，侧栏 nord1，强调 nord8（Frost）配 nord0 的字。
+   原版注释色 nord3 在 nord0 上只有 1.7，弱文字改用 nord9。 */
+[data-theme="nord"] {
+  color-scheme: dark;
+  --bg: #2e3440;
+  --bg-side: #3b4252;
+  --surface: #3b4252;
+  --surface-2: #434c5e;
+  --border: #3b4252;
+  --border-strong: #4c566a;
+  --text: #eceff4;
+  --text-2: #d8dee9;
+  --text-3: #81a1c1;
+  --accent: #88c0d0;
+  --accent-hover: #8fbcbb;
+  --on-accent: #2e3440;
+  --accent-soft: #434c5e;
+  --on-accent-soft: #eceff4;
+  --link: #88c0d0;
+  --ok: #a3be8c;
+  --ok-soft: rgba(163, 190, 140, .16);
+  --warn: #ebcb8b;
+  --warn-soft: rgba(235, 203, 139, .14);
+  --err: #bf616a;
+  --err-soft: rgba(191, 97, 106, .18);
+  --code-bg: #3b4252;
+  --focus: #88c0d0;
+  --selection: rgba(136, 192, 208, .25);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .18), 0 6px 22px rgba(0, 0, 0, .2);
+  --shadow-pop: 0 2px 8px rgba(0, 0, 0, .25), 0 16px 44px rgba(0, 0, 0, .35);
+  --overlay: rgba(46, 52, 64, .7);
+  --rule: transparent;
+  --rule-width: 0px;
+  --font-display: var(--font-sans);
+}
+
+/* Tokyo Night — enkia。底 bg，侧栏 bg_dark，卡片 storm，强调 blue 配 bg_dark 的字，链接 cyan。
+   原版注释色 comment 在 bg 上 2.76，弱文字用 statusbar_fg；comment 留给 --border-strong。 */
+[data-theme="tokyo-night"] {
+  color-scheme: dark;
+  --bg: #1a1b26;
+  --bg-side: #16161e;
+  --surface: #24283b;
+  --surface-2: #292e42;
+  --border: #292e42;
+  --border-strong: #565f89;
+  --text: #c0caf5;
+  --text-2: #a9b1d6;
+  --text-3: #737aa2;
+  --accent: #7aa2f7;
+  --accent-hover: #7dcfff;
+  --on-accent: #16161e;
+  --accent-soft: #292e42;
+  --on-accent-soft: #c0caf5;
+  --link: #7dcfff;
+  --ok: #9ece6a;
+  --ok-soft: rgba(158, 206, 106, .13);
+  --warn: #e0af68;
+  --warn-soft: rgba(224, 175, 104, .13);
+  --err: #f7768e;
+  --err-soft: rgba(247, 118, 142, .13);
+  --code-bg: #16161e;
+  --focus: #bb9af7;
+  --selection: rgba(122, 162, 247, .25);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 24px rgba(0, 0, 0, .32);
+  --shadow-pop: 0 2px 8px rgba(0, 0, 0, .4), 0 16px 44px rgba(0, 0, 0, .5);
+  --overlay: rgba(22, 22, 30, .7);
+  --rule: transparent;
+  --rule-width: 0px;
+  --font-display: var(--font-sans);
+}
+
+/* Catppuccin Mocha — Catppuccin 社区。底 base，侧栏 mantle，卡片 surface0，强调 mauve 配 crust 的字，链接 blue。 */
+[data-theme="catppuccin-mocha"] {
+  color-scheme: dark;
+  --bg: #1e1e2e;
+  --bg-side: #181825;
+  --surface: #313244;
+  --surface-2: #313244;
+  --border: #313244;
+  --border-strong: #585b70;
+  --text: #cdd6f4;
+  --text-2: #bac2de;
+  --text-3: #7f849c;
+  --accent: #cba6f7;
+  --accent-hover: #b4befe;
+  --on-accent: #11111b;
+  --accent-soft: rgba(203, 166, 247, .14);
+  --on-accent-soft: #cdd6f4;
+  --link: #89b4fa;
+  --ok: #a6e3a1;
+  --ok-soft: rgba(166, 227, 161, .12);
+  --warn: #f9e2af;
+  --warn-soft: rgba(249, 226, 175, .12);
+  --err: #f38ba8;
+  --err-soft: rgba(243, 139, 168, .13);
+  --code-bg: #181825;
+  --focus: #b4befe;
+  --selection: rgba(147, 153, 178, .3);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 24px rgba(0, 0, 0, .3);
+  --shadow-pop: 0 2px 8px rgba(0, 0, 0, .4), 0 16px 44px rgba(0, 0, 0, .5);
+  --overlay: rgba(17, 17, 27, .7);
+  --rule: transparent;
+  --rule-width: 0px;
+  --font-display: var(--font-sans);
+}
+
+/* Gruvbox Dark — morhetz。底 bg0，侧栏 bg0_h，卡片 bg1，强调 orange 配 bg0_h 的字，链接 blue。
+   警告用 yellow，和橙色的强调色分开。 */
+[data-theme="gruvbox-dark"] {
+  color-scheme: dark;
+  --bg: #282828;
+  --bg-side: #1d2021;
+  --surface: #3c3836;
+  --surface-2: #3c3836;
+  --border: #3c3836;
+  --border-strong: #665c54;
+  --text: #ebdbb2;
+  --text-2: #bdae93;
+  --text-3: #928374;
+  --accent: #fe8019;
+  --accent-hover: #fabd2f;
+  --on-accent: #1d2021;
+  --accent-soft: #504945;
+  --on-accent-soft: #ebdbb2;
+  --link: #83a598;
+  --ok: #b8bb26;
+  --ok-soft: rgba(184, 187, 38, .14);
+  --warn: #fabd2f;
+  --warn-soft: rgba(250, 189, 47, .13);
+  --err: #fb4934;
+  --err-soft: rgba(251, 73, 52, .14);
+  --code-bg: #1d2021;
+  --focus: #fabd2f;
+  --selection: rgba(146, 131, 116, .35);
+  --shadow: 0 1px 2px rgba(0, 0, 0, .3), 0 6px 24px rgba(0, 0, 0, .3);
+  --shadow-pop: 0 2px 8px rgba(0, 0, 0, .4), 0 16px 44px rgba(0, 0, 0, .5);
+  --overlay: rgba(29, 32, 33, .7);
+  --rule: transparent;
+  --rule-width: 0px;
+  --font-display: var(--font-sans);
+}

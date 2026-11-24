@@ -1,0 +1,5 @@
+# 全部依赖。一般不用手工装：start.sh / start.bat 第一次启动时会自动检查环境、装好（setup/install.sh、setup/install.ps1）。
+# 手工装：python3.12 -m venv .venv && .venv/bin/python -m pip install -r requirements.txt
+# 分成两份：必需的（装不上就不能算装好）和可选的（装不上只少对应的功能）。
+-r setup/requirements-core.txt
+-r setup/requirements-extra.txt
